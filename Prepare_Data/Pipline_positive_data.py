@@ -13,18 +13,15 @@ from consts.datasets_path import POSITIVE_DATASETS_ARR, NEGATIVE_DATASETS_ARR, n
 
 def full_pipline(dataset_file, path_dir_target):
 
-
-
     # step 2- extract duplex of the interaction by VieannaDuplex
     # positive interactions
     print("###############Duplex POSITIVE#############")
     path_dir_target_duplex = path_dir_target / "duplex_step"
-    # duplex_positive('ViennaDuplex', dataset_file, path_dir_target_duplex)
+    duplex_positive('ViennaDuplex', dataset_file, path_dir_target_duplex)
 
-    # For each interaction we calculate feature
+    # For each MTI we calculate features
 
     for fin in path_dir_target_duplex.glob("*.csv"):
-
 
         file_name = os.path.basename(fin)
 
@@ -56,43 +53,8 @@ def full_pipline(dataset_file, path_dir_target):
 
         path_dir_target_feature_step = path_dir_target / "feature_step" / file_name
         to_csv(interaction_after_features, path_dir_target_feature_step)
-
-
-def generate_positive_interaction():
-    pos_dir_name = MERGE_DATA / "positive_interactions_new/data_without_featuers/"
-    for dataset_file in pos_dir_name.glob("*.csv"):
-        if "75" not in str(dataset_file.stem):
-            continue
-        if "clean" not in str(dataset_file.stem):
-            continue
-        dataset_name = str(dataset_file.stem).split("_features.csv")[0].split("_features")[0].split("_ViennaDuplex")[0]
-        print(dataset_name)
-        df = read_csv(dataset_file)
-        df['ID_interaction'] = [f'{dataset_name}_{i}' for i in range(0, len(df))]
-        data_set_dir_name = dataset_name + "_dataset"
-        to_csv(df, dataset_file)
-
-        path = ROOT_PATH_PHD_GOAL_ONE / "Data_Breath_Duplex/"
-        path_dir_target = path / data_set_dir_name
-        full_pipline(dataset_file, path_dir_target)
-        break
-
-
-def generate_negative_interaction():
-    dataset_file = neg_dataset_NPS_CLASH
-    df = read_csv(dataset_file)
-    data_set_dir = "NPS_darnell_human"
-    df['ID_interaction'] = [f'{data_set_dir}_{i}' for i in range(0, len(df))]
-    data_set_dir_name = data_set_dir + "_dataset"
-    to_csv(df, dataset_file)
-    path = ROOT_PATH_PHD_GOAL_ONE / "Data_Breath_Duplex/"
-    path_dir_target = path / data_set_dir_name
-    full_pipline(dataset_file, path_dir_target)
-
-# generate_positive_interaction()
-# generate_negative_interaction()
-
-
+        
+###############################################################################################################################################################
 def not_extended_site():
 
     from Bio.Seq import Seq
@@ -172,10 +134,7 @@ def not_extended_site():
                                             'full_mrna', 'site'), axis=1)
     df["end"] = df.apply(func=get_wrapper(calc_chimera_end,
                                           'start', 'site'), axis=1)
-    # df["site_before"] = df["site"] = df.apply(func=get_wrapper(get_subsequence_by_coordinates2,
-    #                                        "full_mrna", "start", "end", extra_chars=0),axis=1)
-    # df["len_before"] = df["site"].apply(lambda x: len(x))
-
+  
     df["site"] = df.apply(func=get_wrapper(get_subsequence_by_coordinates,
                                            "full_mrna", "start", "end", extra_chars=3),axis=1)
     df["start"] = df.apply(func=get_wrapper(calc_chimera_start,
@@ -186,10 +145,36 @@ def not_extended_site():
     df.drop(columns=['len', 'start', 'end'], inplace=True)
     target_name = MERGE_DATA / "positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment.csv"
     to_csv(df,target_name)
-# not_extended_site()
+    
+###############################################################################################################################################################
+def generate_positive_interaction():
+    pos_dir_name = MERGE_DATA / "positive_interactions_new/data_without_featuers/"
+    for dataset_file in pos_dir_name.glob("*.csv"):
+        dataset_name = str(dataset_file.stem).split("_features.csv")[0].split("_features")[0].split("_ViennaDuplex")[0]
+        print(dataset_name)
+        df = read_csv(dataset_file)
+        df['ID_interaction'] = [f'{dataset_name}_{i}' for i in range(0, len(df))]
+        data_set_dir_name = dataset_name + "_dataset"
+        to_csv(df, dataset_file)
+        path = ROOT_PATH_PHD_GOAL_ONE / "Data_Breath_Duplex/"
+        path_dir_target = path / data_set_dir_name
+        full_pipline(dataset_file, path_dir_target)
+        break
+
+###############################################################################################################################################################
+def generate_negative_interaction():
+    dataset_file = neg_dataset_NPS_CLASH
+    df = read_csv(dataset_file)
+    data_set_dir = "NPS_darnell_human"
+    df['ID_interaction'] = [f'{data_set_dir}_{i}' for i in range(0, len(df))]
+    data_set_dir_name = data_set_dir + "_dataset"
+    to_csv(df, dataset_file)
+    path = ROOT_PATH_PHD_GOAL_ONE / "Data_Breath_Duplex/"
+    path_dir_target = path / data_set_dir_name
+    full_pipline(dataset_file, path_dir_target)
 
 
-
+###############################################################################################################################################################
 def filter_non_conon_interaction():
     # contain not valid interactions
     data_fragment_without_featuers= read_csv("/sise/home/efrco/efrco-master/data/positive_interactions/positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment.csv")
@@ -204,6 +189,6 @@ def filter_non_conon_interaction():
                               "miRNA sequence_x": "miRNA sequence","site_x":"site", "region_x":"region",
                              "valid_row_x":"valid_row", "Gene_ID_x":"Gene_ID", "ID_interaction_x":"ID_interaction" }, inplace=True)
 
-    path_save = Path("/sise/home/efrco/efrco-master/data/positive_interactions/positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment_clean.csv")
-    to_csv(merged_df, path_save)
-    print(merged_df)
+   target_name = MERGE_DATA / "positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment.csv"
+   to_csv(merged_df, path_save)
+   print(merged_df)
