@@ -15,11 +15,7 @@ class FeatureReader:
         col_list = list(data.columns)
         columns_to_remove = ["organism", "Seed_match_canonical", "Seed_match_noncanonical", "Label", "GCN_Prob_Positive", "True_Label"]
         col_list = [col for col in col_list if col not in columns_to_remove]
-
         all_features = col_list[col_list.index("Seed_match_interactions_all"):]
-
-        # all_features = col_list[col_list.index("Acc_P10_10th"):]
-
         return all_features
 
     def file_reader(self, in_file: Path) -> (DataFrame, ndarray):
@@ -40,16 +36,11 @@ class FeatureReader:
         y: ndarray = in_df.Label.ravel()
         feature_list: List = self._feature(in_df)
         X = in_df[feature_list]
-        # assert len(X.columns) == self.expected_num_of_features, f"""Read error. Wrong number of features.
-        #        Read: {len(X.columns)}
-        #        Expected: {self.expected_num_of_features}"""
         return X, y
-
 
 
 class AllWithoutEmbeddingReader(FeatureReader):
     def __init__(self):
-        #super().__init__(580-90)
         super().__init__(500)
 
     def setnumbrtexperiments(self, exp_id):
@@ -77,7 +68,6 @@ class AllWithEmbedding(FeatureReader):
         cfg = import_consts(self.exp_id)
         all_features = super()._feature(data)
         all_features = [f for f in all_features if not str(f).startswith("HotPairing")]
-        # assert len(all_features) == 500 + cfg.dim_vector_out, f"All feature read error. Read: {len(all_features)} and the dim is  {cfg.dim_vector_out}"
         return all_features
 
 class OnlyWithEmbedding(FeatureReader):
@@ -91,7 +81,6 @@ class OnlyWithEmbedding(FeatureReader):
         cfg = import_consts(self.exp_id)
         all_features = super()._feature(data)
         all_features = [f for f in all_features if str(f).startswith("dim")]
-        # assert len(all_features) == cfg.dim_vector_out, f"All feature read error. Read: {len(all_features)}"
         return all_features
 
 class AllFeatursReader(FeatureReader):
