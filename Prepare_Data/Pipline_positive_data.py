@@ -175,20 +175,3 @@ def generate_negative_interaction():
 
 
 ###############################################################################################################################################################
-def filter_non_conon_interaction():
-    # contain not valid interactions
-    data_fragment_without_featuers= read_csv("/sise/home/efrco/efrco-master/data/positive_interactions/positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment.csv")
-    print(data_fragment_without_featuers)
-    # in this file contain only interaction that canon or not canon
-    data_fragment_with_featuers= read_csv("/sise/home/efrco/efrco-master/data/positive_interactions/positive_interactions_new/featuers_step/darnell_human_ViennaDuplex_75nt_fragment_features.csv")
-    print(data_fragment_with_featuers)
-    merged_df = pd.merge(data_fragment_without_featuers, data_fragment_with_featuers, on='key', how='inner')
-    merged_df = merged_df[['key', 'paper name_x', 'organism_x', 'miRNA ID_x', 'miRNA sequence_x', 'site_x', 'region_x',
-                          'valid_row_x', 'full_mrna', 'Gene_ID_x', 'ID_interaction_x']]
-    merged_df.rename(columns={'paper name_x': 'paper name', "miRNA ID_x":"miRNA ID",
-                              "miRNA sequence_x": "miRNA sequence","site_x":"site", "region_x":"region",
-                             "valid_row_x":"valid_row", "Gene_ID_x":"Gene_ID", "ID_interaction_x":"ID_interaction" }, inplace=True)
-
-   target_name = MERGE_DATA / "positive_interactions_new/data_without_featuers/darnell_human_ViennaDuplex_75nt_fragment.csv"
-   to_csv(merged_df, path_save)
-   print(merged_df)
