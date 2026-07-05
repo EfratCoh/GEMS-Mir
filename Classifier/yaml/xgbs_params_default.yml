@@ -1,0 +1,8 @@
+xgbs:
+  run: true
+  model_parameters:
+    eval_metric: logloss
+    use_label_encoder: False
+  fit_parameters:
+#    early_stopping_rounds: 50
+    verbose: True
