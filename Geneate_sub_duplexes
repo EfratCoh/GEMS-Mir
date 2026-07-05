@@ -10,7 +10,6 @@ filter_non_conon_interaction()
 not_extended_site()
 generate_positive_interaction()
 generate_negative_interaction()
-filter_non_conon_interaction()
 
 # 2 step - generate a matrix of probability, pay attention that we need to run that for negative and positive data.
 run_generate_matrices()
