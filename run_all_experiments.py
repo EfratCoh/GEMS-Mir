@@ -7,22 +7,15 @@ import os
 from consts.global_consts import ROOT_PATH_PHD_GOAL_ONE
 
 # Define grid of parameters
-# params = {
-#     "number_epoch": [80, 40, 50, 100, 120],
-#     "learning_rate": [0.001, 0.006],
-#     "dim_vector_in": [64, 128],
-#     "dim_vector_out": [64, 128, 256, 300],
-#     "batch_size": [32, 64],
-#     "n_classes": [2]
-# }
 params = {
-    "number_epoch": [80],
+    "number_epoch": [80, 40, 50, 100, 120],
     "learning_rate": [0.001, 0.006],
     "dim_vector_in": [64, 128],
     "dim_vector_out": [64, 128, 256, 300],
     "batch_size": [32, 64],
     "n_classes": [2]
 }
+
 
 param_combinations = list(itertools.product(*params.values()))
 param_df = pd.DataFrame(param_combinations, columns=params.keys())
@@ -80,30 +73,7 @@ for i, row in param_df.iterrows():
         python_path, str(main_script)
     ], env=env_vars, capture_output=True, text=True)
 
-    # print("Return code:", result.returncode)
-    # print("STDOUT:\n", result.stdout)
-    # print("STDERR:\n", result.stderr)
+
     print(f"[FINISH] Experiment {i + 1}/{len(param_df)}: {folder_name}")
 
-    # # Save stdout to log file
-    # with open(exp_path / "experiment_log.txt", "w") as log_file:
-    #     log_file.write(result.stdout)
-    #     log_file.write("\nSTDERR:\n")
-    #     log_file.write(result.stderr)
-    #
-    # # Try to find results.csv in exp_path / Results directory
-    # results_csv_path = exp_path / "Results" / "summary_metrics.csv"
-    # if results_csv_path.exists():
-    #     df_result = pd.read_csv(results_csv_path)
-    #     df_result["experiment_folder"] = folder_name
-    #     for param in row.index:
-    #         df_result[param] = row[param]
-    #     results_summary_list.append(df_result)
-
-# # Save all combined results
-# if results_summary_list:
-#     final_df = pd.concat(results_summary_list, ignore_index=True)
-#     final_df.to_csv(base_dir / "all_experiment_results.csv", index=False)
-#     print(f"[SUCCESS] All experiment results saved to {base_dir / 'all_experiment_results.csv'}")
-# else:
-#     print("[WARNING] No results found to summarize.")
+   
