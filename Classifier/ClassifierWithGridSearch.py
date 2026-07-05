@@ -6,11 +6,7 @@ import pickle
 import Classifier.FeatureReader as FeatureReader
 from Classifier.FeatureReader import get_reader
 from Classifier.ClfLogger import logger
-# from utils.utilsfile import read_csv, to_csv, clean_directory, get_wrapper, import_consts
 from sklearn.metrics import accuracy_score
-# import FeatureReader as FeatureReader
-# from FeatureReader import get_reader
-# from ClfLogger import logger
 from utils.utilsfile import read_csv, to_csv, import_consts
 from pathlib import Path
 import re
@@ -36,7 +32,7 @@ class ClassifierWithGridSearch(object):
             "xgbs_no_encoding": XGBClassifier(),
         }
 
-    # this function response on load the dataset
+    # This function response on load the dataset
     def load_dataset(self):
         directory = self.dataset_file.parent
         feature_reader = get_reader()
@@ -46,7 +42,7 @@ class ClassifierWithGridSearch(object):
         self.y = y
 
 
-    # this function response on train model and then save this model
+    # This function response on train model and then save this model
     def train_one_conf(self, clf_name, conf, scoring="accuracy"):
 
         output_file = self.result_dir / f"{self.dataset_name.split('merged_train_')[1]}_{clf_name}.csv"
@@ -105,8 +101,6 @@ def self_fit(feature_mode,models_dir, yaml_file, number_fold, number_epoch, base
             continue
         results_dir = base_dir / f'{models_dir}' / f'fold{number_fold}'
         results_dir.mkdir(parents=True, exist_ok=True)
-        # if int(number_epoch)==0:
-        #     clean_directory(results_dir)
 
         logger.info(f"results_dir = {results_dir}")
         logger.info(f"start dataset = {f}")
@@ -116,12 +110,9 @@ def self_fit(feature_mode,models_dir, yaml_file, number_fold, number_epoch, base
 
 
 def build_classifiers(number_fold, number_epoch, models_dir,feature_mode, base_dir, exp_id):
-    # yaml_file = "/sise/home/efrco/PHD/Goal_One/Classifier/yaml/xgbs_params_small.yml"
-    # yaml_file = "/sise/home/efrco/PHD/Goal_One/Classifier/yaml/xgbs_params.yml"
     yaml_file = "/home/efrco/PHD/Goal_One/Classifier/yaml/xgbs_params_default.yml"
     number_fold = str(number_fold)
     number_epoch = str(number_epoch)
-
     self_fit(feature_mode=feature_mode,models_dir=models_dir, yaml_file=yaml_file, number_fold= number_fold, number_epoch=number_epoch, base_dir=base_dir, exp_id=exp_id)
     print("END main_primary")
 
@@ -136,7 +127,3 @@ def train_models(exp_id, model_mod, feature_mode, base_dir):
         number_epoch = count_epochs(base_dir, fold)
         for epoch in range(0,number_epoch):
             build_classifiers(number_fold=fold, number_epoch=epoch,models_dir = model_mod,  feature_mode=feature_mode, base_dir=base_dir, exp_id = exp_id)
-#
-# base_dir = Path("/mnt/new_groups/vaksler_group/Efrat/Results/experiment_runs_16_featuers/run_epochs_80.0_lr_0.006_din_128.0_dout_256.0_bs_64.0/")
-# train_models(exp_id= 1, model_mod = "models_xgbs_combine_embedding", feature_mode= "with_embedding_vector", base_dir =base_dir)
-# train_models(exp_id= 0, model_mod = "models_xgbs_without_embedding", feature_mode= "without_embedding_vector", base_dir= base_dir)
