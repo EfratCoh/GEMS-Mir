@@ -8,7 +8,7 @@ from consts.global_consts import ROOT_PATH_PHD_GOAL_ONE
 
 # Define grid of parameters
 params = {
-    "number_epoch": [80, 40, 50, 100, 120],
+    "number_epoch": [80, 40, 50],
     "learning_rate": [0.001, 0.006],
     "dim_vector_in": [64, 128],
     "dim_vector_out": [64, 128, 256, 300],
