@@ -1,12 +1,11 @@
 
-from Prepare_Data.Pipline_generate_sub_duplex_data import generate_positive_interaction,extended_site,filter_non_conon_interaction, generate_negative_interaction
+from Prepare_Data.Pipline_generate_sub_duplex_data import generate_positive_interaction,filter_non_conon_interaction, generate_negative_interaction
 from Representative_Graph.Probability_Matrix import run_generate_matrices
 from Classifier.train_test_stratifiedKFold import StratifiedKFold_splits
 import os
 
 
 # 1 step - generate the sub-optimal interaction
-extended_site()
 generate_positive_interaction()
 generate_negative_interaction()
 
