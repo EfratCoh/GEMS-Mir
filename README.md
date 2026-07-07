@@ -18,8 +18,6 @@ The repository is organized according to the major stages of the GEMS-Mir framew
 | **mirna_utils/** | General utilities for miRNA processing. |
 | **utils/** | General helper functions used throughout the project. |
 | **consts/** | Global configuration files and constants. |
-| **pipeline_steps/** | Individual preprocessing stages used by the complete pipeline. |
-| **pipline_steps_negative/** | Pipeline components specific to the negative interaction dataset. |
 
 ---
 
@@ -30,7 +28,7 @@ The repository provides two main execution scripts.
 ## Step 1 — Generation of Structural Representations
 
 ```
-full_pipeline.py
+Generate_sub_duplexes.py
 ```
 
 This script performs the complete preprocessing stage starting from the curated MTI datasets.
