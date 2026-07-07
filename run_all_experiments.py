@@ -30,15 +30,7 @@ param_df.to_csv(base_dir / "experiment_grid.csv", index=False)
 # Initialize list to collect results
 results_summary_list = []
 
-# Iterate over each experiment
-# for i, row in param_df.iterrows():
-#     folder_name = f"run_epochs_{row['number_epoch']}_lr_{row['learning_rate']}_din_{row['dim_vector_in']}_dout_{row['dim_vector_out']}_bs_{row['batch_size']}"
-#     exp_path = base_dir / folder_name
-#     exp_path.mkdir(parents=True, exist_ok=True)
-#
-#     print(f"[RUNNING] Experiment {i+1}/{len(param_df)}: {folder_name}")
-
-main_script = Path("/home/efrco/PHD/Goal_One/main_experiment.py")
+main_script = Path("./main_experiment.py")
 
 # Iterate over each experiment
 for i, row in param_df.iterrows():
@@ -67,7 +59,7 @@ for i, row in param_df.iterrows():
         "GCNN_N_CLASSES": str(row['n_classes']),
         "GCNN_EXP_DIR": str(exp_path)
     }
-    python_path = "/home/efrco/.local/share/virtualenvs/efrco-master-BYjOffaj/bin/python3.7"
+    python_path = "./bin/python3.7"
 
     result = subprocess.run([
         python_path, str(main_script)
