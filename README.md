@@ -69,7 +69,7 @@ This script automates the execution of multiple experimental configurations repo
 
 # Dataset
 
-The datasets accompanying this work are available from Zenodo.
+The datasets accompanying this work are available from Zenodo: https://doi.org/10.5281/zenodo.21220858.
 
 They include:
 
