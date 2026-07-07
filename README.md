@@ -40,16 +40,16 @@ git clone https://github.com/EfratCoh/GEMS-Mir.git
 cd GEMS-Mir
 ```
 
-Create a virtual environment and install the required packages:
+Install the required Python packages:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+GEMS-Mir requires the ViennaRNA package for thermodynamic sub-duplex generation.
+Please install ViennaRNA according to the official installation instructions:
+
+https://www.tbi.univie.ac.at/RNA/
 ---
 
 # Dataset
