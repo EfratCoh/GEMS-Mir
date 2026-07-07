@@ -13,8 +13,7 @@ from consts.datasets_path import POSITIVE_DATASETS_ARR, NEGATIVE_DATASETS_ARR, n
 
 def full_pipline(dataset_file, path_dir_target):
 
-    # step 2- extract duplex of the interaction by VieannaDuplex
-    # positive interactions
+    # step 1- extract duplex of the interaction by VieannaDuplex
     print("###############Duplex#############")
     path_dir_target_duplex = path_dir_target / "duplex_step"
     duplex_positive('ViennaDuplex', dataset_file, path_dir_target_duplex)
@@ -29,7 +28,7 @@ def full_pipline(dataset_file, path_dir_target):
             print("The directory interaction exists, proceeding...", path_dir_target_feature_step)
             continue
 
-        # step 3- extract the site and its coordinates
+        # step 2- extract the site and its coordinates
         print("###############Site#############")
 
         interaction_after_duplex = read_csv(fin)
@@ -37,11 +36,10 @@ def full_pipline(dataset_file, path_dir_target):
 
         print("###############Normaliztion#############")
 
-        # step 4- normalization of the dataframe
-
+        # step 3- normalization of the dataframe
         interaction_after_normalization = finalize(interaction_after_site)
 
-        # step 5- extract features
+        # step 4 - extract features
         print("###############extract features#############")
 
         interaction_after_features = feature_extraction(interaction_after_normalization)
