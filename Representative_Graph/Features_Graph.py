@@ -3,174 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from consts.global_consts import dict_map_label_dataset, FOLDS_PATH, MERGE_DATA, Data_Embedding, number_epoch, ROOT_PATH_PHD_GOAL_ONE, NEGATIVE_DATA_PATH, POSITIVE_PATH_FEATUERS, MATRIX_DATA
-# from consts.GNN_consts import *
 
-
-def nucleotide_to_feature(nuc):
-    """
-    One-hot for A, C, G, U/T + GC-flag + Unknown flag
-    Total: 6 dimensions
-    """
-    mapping = {
-        'A': [1, 0, 0, 0],   # not GC
-        'C': [0, 1, 0, 0],   # GC
-        'G': [0, 0, 1, 0],   # GC
-        'U': [0, 0, 0, 1],   # not GC
-        'T': [0, 0, 0, 1],   # not GC
-        'N': [0, 0, 0, 0],   # unknown
-    }
-
-    nuc = nuc.upper()
-    base = mapping.get(nuc, [0, 0, 0, 0])  # ברירת מחדל = לא ידוע
-    gc_flag = 1 if nuc in ['G', 'C'] else 0
-    unknown_flag = 1 if nuc == 'N' else 0
-
-    return base + [gc_flag, unknown_flag]  # סה"כ 6 תכונות
-
-
-def nucleotide_to_feature_extended(nuc, i, seq_length, max_length=30):
-    """
-    Returns a 12-dimensional feature vector for a nucleotide in a sequence:
-    - One-hot encoding (A, C, G, U/T)
-    - GC content flag
-    - Unknown nucleotide flag (N)
-    - Purine / Pyrimidine flags
-    - Normalized position in sequence
-    - Is first / is last flags
-    - Normalized sequence length
-    """
-
-    # One-hot encoding for known nucleotides
-    mapping = {
-        'A': [1, 0, 0, 0],
-        'C': [0, 1, 0, 0],
-        'G': [0, 0, 1, 0],
-        'U': [0, 0, 0, 1],
-        'T': [0, 0, 0, 1],  # T treated like U
-        'N': [0, 0, 0, 0]   # Unknown nucleotide
-    }
-
-    nuc = nuc.upper()
-    one_hot = mapping.get(nuc, [0, 0, 0, 0])
-
-    # Flag if nucleotide is G or C
-    is_gc = 1 if nuc in ['G', 'C'] else 0
-
-    # Flag if nucleotide is unknown
-    is_unknown = 1 if nuc == 'N' else 0
-
-    # Flag if nucleotide is purine (A or G)
-    is_purine = 1 if nuc in ['A', 'G'] else 0
-
-    # Flag if nucleotide is pyrimidine (C, U, or T)
-    is_pyrimidine = 1 if nuc in ['C', 'U', 'T'] else 0
-
-    # Normalized position within the sequence
-    pos_norm = i / seq_length if seq_length > 0 else 0
-
-    # Flag if nucleotide is the first in the sequence
-    is_first = 1 if i == 0 else 0
-
-    # Flag if nucleotide is the last in the sequence
-    is_last = 1 if i == seq_length - 1 else 0
-
-    # Normalized sequence length (relative to a fixed max_length)
-    length_norm = seq_length / max_length if max_length > 0 else 0
-
-    # Final feature vector
-    return one_hot + [
-        is_gc,
-        is_unknown,
-        is_purine,
-        is_pyrimidine,
-        pos_norm,
-        is_first,
-        is_last,
-        length_norm
-    ]
-
-def nucleotide_to_feature_rich(nuc, i, seq_length, seq, max_length=30, kmer_window=2):
-    """
-    Returns a rich feature vector for a nucleotide in a sequence:
-    - One-hot encoding (A, C, G, U/T)
-    - GC content flag
-    - Unknown nucleotide flag (N)
-    - Purine / Pyrimidine flags
-    - Wobble pairing potential flag (G/U)
-    - Frequency of the nucleotide in the sequence
-    - Local GC density (k-mer window around the nucleotide)
-    - Local sequence entropy (k-mer window)
-    - Normalized position in sequence
-    - Is first / is last flags
-    - Normalized sequence length
-    """
-
-    # One-hot encoding for known nucleotides
-    mapping = {
-        'A': [1, 0, 0, 0],
-        'C': [0, 1, 0, 0],
-        'G': [0, 0, 1, 0],
-        'U': [0, 0, 0, 1],
-        'T': [0, 0, 0, 1],  # T treated like U
-        'N': [0, 0, 0, 0]   # Unknown nucleotide
-    }
-
-    nuc = nuc.upper()
-    one_hot = mapping.get(nuc, [0, 0, 0, 0])
-
-    # Basic flags
-    is_gc = 1 if nuc in ['G', 'C'] else 0
-    is_unknown = 1 if nuc == 'N' else 0
-    is_purine = 1 if nuc in ['A', 'G'] else 0
-    is_pyrimidine = 1 if nuc in ['C', 'U', 'T'] else 0
-
-    # Wobble pairing potential (G/U)
-    is_wobble = 1 if nuc in ['G', 'U'] else 0
-
-    # Frequency of nucleotide in the sequence
-    nuc_count = seq.upper().count(nuc) if seq_length > 0 else 0
-    nuc_freq = nuc_count / seq_length if seq_length > 0 else 0
-
-    # Local GC density (k-mer window)
-    left = max(0, i - kmer_window)
-    right = min(seq_length, i + kmer_window + 1)
-    local_seq = seq[left:right].upper()
-    gc_count = local_seq.count('G') + local_seq.count('C')
-    local_gc_density = gc_count / len(local_seq) if len(local_seq) > 0 else 0
-
-    # Local sequence entropy (Shannon entropy)
-    from collections import Counter
-    import math
-
-    counts = Counter(local_seq)
-    probs = [count / len(local_seq) for count in counts.values()]
-    entropy = -sum(p * math.log2(p) for p in probs) if len(probs) > 0 else 0
-
-    # Normalized position within the sequence
-    pos_norm = i / seq_length if seq_length > 0 else 0
-
-    # First / Last flags
-    is_first = 1 if i == 0 else 0
-    is_last = 1 if i == seq_length - 1 else 0
-
-    # Normalized sequence length (relative to a fixed max_length)
-    length_norm = seq_length / max_length if max_length > 0 else 0
-
-    # Final feature vector (14 features total)
-    return one_hot + [
-        is_gc,
-        is_unknown,
-        is_purine,
-        is_pyrimidine,
-        is_wobble,
-        nuc_freq,
-        local_gc_density,
-        entropy,
-        pos_norm,
-        is_first,
-        is_last,
-        length_norm
-    ]
 
 def nucleotide_to_feature_16(nuc, i, seq_length, seq, max_length=30, kmer_window=2):
     """
@@ -269,7 +102,6 @@ def add_features_to_graphs(cfg, g, sequence_data, num_mirna_nodes, num_mrna_node
 
     for i in range(num_mirna_nodes):
         if i < len(mirna_seq):
-            # feats = nucleotide_to_feature_extended(mirna_seq[i], i, len(mirna_seq))
             feats = nucleotide_to_feature_16(mirna_seq[i], i, len(mirna_seq), mirna_seq)
 
             feats_tensor = torch.tensor(feats, dtype=torch.float32)
@@ -278,7 +110,6 @@ def add_features_to_graphs(cfg, g, sequence_data, num_mirna_nodes, num_mrna_node
     for i in range(num_mrna_nodes):
         idx = num_mirna_nodes + i
         if i < len(mrna_seq):
-            # feats = nucleotide_to_feature_extended(mrna_seq[i], i, len(mrna_seq))
             feats = nucleotide_to_feature_16(mrna_seq[i], i, len(mrna_seq), mrna_seq)
 
             feats_tensor = torch.tensor(feats, dtype=torch.float32)
@@ -286,30 +117,6 @@ def add_features_to_graphs(cfg, g, sequence_data, num_mirna_nodes, num_mrna_node
 
     g.ndata['feature'] = node_features
     return g
-
-#
-# def create_graph_with_features(matrices, sequence_dict, idx, weight_scale_factor=1e10):
-#     graphs = []
-#     num_graph = 0
-#     for matrix in matrices:
-#         matrix = torch.tensor(matrix, dtype=torch.float32)
-#         src, dst = matrix.nonzero(as_tuple=True)
-#         num_mirna_nodes = matrix.shape[0]
-#         num_mrna_nodes = matrix.shape[1]
-#         dst += num_mirna_nodes
-#
-#         weights = matrix[src, dst - num_mirna_nodes]
-#         g = dgl.graph((src, dst), num_nodes=num_mirna_nodes + num_mrna_nodes)
-#         g.edata['weight'] = weights * weight_scale_factor
-#         g = dgl.to_bidirected(g, copy_ndata=True)
-#         g = dgl.add_self_loop(g, fill_data=0.1)
-#
-#         g = add_features_to_graphs(g, sequence_dict[idx[num_graph]], num_mirna_nodes, num_mrna_nodes)
-#
-#         graphs.append(g)
-#         num_graph += 1
-#
-#     return graphs
 
 
 def create_graph_with_features(cfg, matrices, sequence_dict, idx, weight_scale_factor=5.0):
