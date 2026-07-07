@@ -15,12 +15,11 @@ def full_pipline(dataset_file, path_dir_target):
 
     # step 2- extract duplex of the interaction by VieannaDuplex
     # positive interactions
-    print("###############Duplex POSITIVE#############")
+    print("###############Duplex#############")
     path_dir_target_duplex = path_dir_target / "duplex_step"
     duplex_positive('ViennaDuplex', dataset_file, path_dir_target_duplex)
 
     # For each MTI we calculate features
-
     for fin in path_dir_target_duplex.glob("*.csv"):
 
         file_name = os.path.basename(fin)
@@ -30,7 +29,7 @@ def full_pipline(dataset_file, path_dir_target):
             print("The directory interaction exists, proceeding...", path_dir_target_feature_step)
             continue
 
-        # step 3- extract the site and his coordination's
+        # step 3- extract the site and its coordinates
         print("###############Site#############")
 
         interaction_after_duplex = read_csv(fin)
