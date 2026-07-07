@@ -9,12 +9,11 @@ The repository is organized according to the major stages of the GEMS-Mir framew
 
 | Folder | Description |
 |---------|-------------|
-| **Prepare_Data/** | Data preprocessing and preparation of the positive and negative MTI datasets. |
-| **generate_interactions/** | Generation and filtering of candidate miRNA–mRNA sub-duplexes. |
+| **features/** | Extraction of handcrafted biological features. |
 | **duplex/** | Utilities for duplex parsing and thermodynamic analysis. |
 | **BreathesDuplex/** | Construction and processing of thermodynamic sub-duplex ensembles. |
-| **Representative_Graph/** | Construction of probabilistic weighted nucleotide graphs from duplex ensembles. |
-| **features/** | Extraction of handcrafted biological features. |
+| **Prepare_Data/** | Data preprocessing and preparation of the sub-duplexes' positive and negative MTI datasets, including handcrafted featuers extraction. |
+| **Representative_Graph/** | Construction of probabilistic weighted nucleotide-level graphs from thermodynamic sub-optimal duplex ensembles (Probability_Matrix.py) and learning of structure-aware graph embeddings using a Graph Convolutional Network (GCNN_embedding_StratifiedKFold.py). |
 | **Classifier/** | Hybrid XGBoost classification framework. |
 | **mirna_utils/** | General utilities for miRNA processing. |
 | **utils/** | General helper functions used throughout the project. |
