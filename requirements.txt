@@ -16,13 +16,11 @@ viennarna>=2.5
 
 matplotlib>=3.5
 seaborn>=0.12
-shap>=0.42
-umap-learn>=0.5
 
-PyYAML>=6.0
-click>=8.0
 tqdm>=4.64
 joblib>=1.2
+PyYAML>=6.0
+click>=8.0
 
 logbook>=1.5
 
