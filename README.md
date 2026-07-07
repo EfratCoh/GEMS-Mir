@@ -3,6 +3,16 @@ Official implementation of **GEMS-Mir: Graph Learning from Thermodynamic Ensembl
 <img width="5315" height="3543" alt="summary_figure" src="https://github.com/user-attachments/assets/12838fef-12e6-4b35-a3d1-024895be7e04" />
 
 
+## Overview
+
+GEMS-Mir is a hybrid machine learning framework for predicting miRNA–target interactions (MTIs). Unlike conventional approaches that rely on a single minimum free-energy (MFE) duplex, GEMS-Mir explicitly models the thermodynamic ensemble of plausible miRNA–mRNA binding conformations.
+
+Each interaction is represented as an ensemble of thermodynamically plausible sub-optimal duplexes. These structures are integrated into a probabilistic nucleotide-level representation, from which weighted graphs are constructed. A Graph Convolutional Network (GCN) learns structure-aware graph embeddings that are subsequently combined with handcrafted biological features within an XGBoost classifier for final MTI prediction.
+
+The repository contains the complete implementation of the computational pipeline described in the accompanying manuscript.
+
+---
+
 # Repository Organization
 
 The repository is organized according to the major stages of the GEMS-Mir framework.
@@ -21,76 +31,88 @@ The repository is organized according to the major stages of the GEMS-Mir framew
 
 ---
 
-# Running the GEMS-Mir Pipeline
+# Installation
 
-The repository provides two main execution scripts.
+Clone the repository:
 
-## Step 1 — Thermodynamic Ensemble Generation
-```
-Generate_sub_duplexes.py
-```
-
-This script performs the complete preprocessing stage starting from the curated MTI datasets.
-
-The pipeline includes:
-
-- generation of thermodynamically plausible sub-duplexes using RNAduplex;
-- construction of an interaction-specific probabilistic pairing matrix that summarizes the ensemble of sub-optimal duplex conformations;
-- extraction of handcrafted biological descriptors.
-
-The generated probabilistic matrices are subsequently used to construct weighted nucleotide-level graphs and train the Graph Convolutional Network (GCN) in the second stage of the pipeline.
----
-
-## Step 2 — Graph Representation Learning and Classification
-
-```
-main_experiment.py
+```bash
+git clone https://github.com/EfratCoh/GEMS-Mir.git
+cd GEMS-Mir
 ```
 
-This script performs the machine learning stage of GEMS-Mir.
+Create a virtual environment and install the required packages:
 
-The workflow includes:
+```bash
+python3 -m venv venv
+source venv/bin/activate
 
-- training the Graph Convolutional Network (GCN);
-- extraction of graph embeddings;
-- integration of graph embeddings with handcrafted biological features;
-- training of the XGBoost classifier;
-- evaluation using the predefined 10-fold cross-validation protocol;
-- generation of the final prediction scores and evaluation metrics reported in the manuscript.
----
-## Optional – Running the Complete Experimental Suite
-
-```
-run_all_experiments.py
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-This script automates the execution of multiple experimental configurations reported in the manuscript.
 ---
 
 # Dataset
 
-The datasets accompanying this work are available from Zenodo: https://doi.org/10.5281/zenodo.21220858.
+The datasets accompanying this work are publicly available through Zenodo: https://doi.org/10.5281/zenodo.21220858.
 
 They include:
 
-- curated positive MTIs;
-- curated negative MTIs;
-- predefined 10-fold cross-validation splits.
+- Curated positive MTIs
+- Curated negative MTIs
+- Predefined 10-fold cross-validation splits
 
-The complete preprocessing pipeline is implemented in this repository.
+After downloading the archive, place the dataset under the project data directory.
 
+---
+
+# Experiments Reproduction
+
+The complete experimental pipeline consists of two consecutive stages.
+
+## Step 1 — Thermodynamic Ensemble Generation
+
+Run:
+
+```bash
+python generate_structural_representation.py
+```
+
+This stage performs:
+
+- generation of thermodynamically plausible sub-duplexes using RNAduplex;
+- construction of an interaction-specific probabilistic pairing matrix by integrating the complete ensemble of sub-optimal duplex conformations;
+- extraction of handcrafted biological features.
+
+The output of this stage is a structural representation for every miRNA–target interaction, consisting of:
+
+- thermodynamic sub-duplex ensembles;
+- probabilistic pairing matrices;
+- handcrafted biological features.
+
+These outputs serve as the input for the graph construction and graph representation learning stage.
+
+---
+
+## Step 2 — Run the GEMS-Mir Experiments
+
+```bash
+python run_all_experiments.py
+```
+
+This script automatically executes the complete experimental workflow described in the manuscript, including graph representation learning, GCN training, graph embedding extraction, hybrid classification, and performance evaluation.
 ---
 
 # Citation
 
 If you use this repository, please cite:
 
-Efrat Cohen-Davidi and Isana Veksler-Lublinsky.
-
-**GEMS-Mir: Graph Learning from Thermodynamic Ensembles of miRNA–mRNA Duplexes for miRNA–Target Interaction Prediction.**
+> Efrat Cohen-Davidi and Isana Veksler-Lublinsky.
+>
+> **GEMS-Mir: Graph Learning from Thermodynamic Ensembles of miRNA–mRNA Duplexes for miRNA–Target Interaction Prediction.**
 
 ---
 
 # License
 
-MIT License.
+This project is distributed under the MIT License.
