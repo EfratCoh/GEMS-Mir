@@ -52,7 +52,7 @@ def full_pipline(dataset_file, path_dir_target):
         to_csv(interaction_after_features, path_dir_target_feature_step)
         
 ###############################################################################################################################################################
-def not_extended_site():
+def extended_site():
 
     from Bio.Seq import Seq
     from Bio.SeqFeature import FeatureLocation
